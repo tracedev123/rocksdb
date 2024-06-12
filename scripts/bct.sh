@@ -8,7 +8,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-trace_data_dir="../trace_data_dir/burner"
+trace_data_dir="../trace_data_dir_2/rw_2"
 
 
 block_trace_file_path="$trace_data_dir/block_cache_trace_file"
@@ -17,6 +17,7 @@ if [ -z $disable_bcp ]; then
 bct_path="../cmake-build-debug/block_cache_trace_analyzer"
 bct_human_file_path="$trace_data_dir/bct_human_readable_file"
 $bct_path \
- -block_cache_trace_path="/tmp/block_cache_trace_file_dbbench_2"\
- -human_readable_trace_file_path="$bct_human_file_path"
+ -block_cache_trace_path="/tmp/block_cache_trace_file_dbbench"\
+ -human_readable_trace_file_path="$bct_human_file_path" \
+ -print_access_count_stats
 fi

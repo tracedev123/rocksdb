@@ -15,13 +15,13 @@
 #done
 
 
-exec_path="../cmake-build-debug-remote/db_bench"
-db_path="/tmp/db"
-$exec_path   --benchmarks="fillseq,stats" --statistics --histogram --db=$db_path --num_column_families=5  \
---key_size=20 --prefix_size=20 --keys_per_prefix=0 --value_size=100 \
---cache_index_and_filter_blocks --cache_size=1048576 \
---disable_auto_compactions=1 --disable_wal=1 --compression_type=none \
---min_level_to_compress=-1 --compression_ratio=1 --num=1000000
+exec_path="../cmake-build-debug/db_bench"
+db_path="/tmp/db_1"
+$exec_path --benchmarks="fillrandom" --db="$db_path" --perf_level=3 \
+--key_size=48 --value_size=43 --threads=1 --num_column_families=2 \
+--use_direct_reads=true --cache_size=268435456 \
+--use_direct_io_for_flush_and_compaction=true \
+--num=1000000
 #
 #trace_data_dir="./trace_data_dir"
 #rm -rf "$trace_data_dir"

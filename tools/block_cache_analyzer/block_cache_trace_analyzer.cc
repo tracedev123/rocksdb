@@ -20,6 +20,7 @@
 #include "monitoring/histogram.h"
 #include "rocksdb/system_clock.h"
 #include "rocksdb/trace_record.h"
+#include "rocksdb/utilities/ldb_cmd.h"
 #include "util/gflags_compat.h"
 #include "util/string_util.h"
 
@@ -1494,9 +1495,11 @@ Status BlockCacheTraceAnalyzer::RecordAccess(
   block_access_info.AddAccess(access, access_sequence_number_);
   block_info_map_[access.block_key] = &block_access_info;
   uint64_t get_key_id = 0;
+  std::string user_key = "";
   if (access.caller == TableReaderCaller::kUserGet &&
       access.get_id != BlockCacheTraceHelper::kReservedGetId) {
-    std::string user_key = ExtractUserKey(access.referenced_key).ToString();
+    user_key = ExtractUserKey(access.referenced_key).ToString();
+//    fprintf(stdout, "key: '%s'\n", ROCKSDB_NAMESPACE::LDBCommand::StringToHex(ExtractUserKey(access.referenced_key).ToString()).c_str());
     if (get_key_info_map_.find(user_key) == get_key_info_map_.end()) {
       get_key_info_map_[user_key].key_id = unique_get_key_id_;
       unique_get_key_id_++;
@@ -1521,7 +1524,7 @@ Status BlockCacheTraceAnalyzer::RecordAccess(
     }
   }
   return human_readable_trace_writer_.WriteHumanReadableTraceRecord(
-      access, block_access_info.block_id, get_key_id);
+      access, block_access_info.block_id, get_key_id, user_key);
 }
 
 Status BlockCacheTraceAnalyzer::Analyze() {

@@ -60,7 +60,7 @@ Status TraceExecutionHandler::Handle(
   }
   auto it = cf_map_.find(record.GetColumnFamilyID());
   if (it == cf_map_.end()) {
-    return Status::Corruption("Invalid Column Family ID.");
+    return Status::Corruption("Invalid Column Family IDHERE.");
   }
 
   uint64_t start = clock_->NowMicros();

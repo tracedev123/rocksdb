@@ -102,6 +102,13 @@ DEFINE_bool(convert_to_human_readable_trace, false,
             "needed in the next step.\n"
             "File name: <prefix>_human_readable_trace.txt\n"
             "Format:[<key> type_id cf_id value_size time_in_micorsec].");
+
+DEFINE_bool(output_ml_features, false,
+            "output txt file with format\n"
+            "query type access count, total unique keys in this cf, average key size, key size median"
+            "key size variation, value size average, value size median, value size variation, "
+            "mean, mode, median, 1st Quartiles, 3rd Quartiles, skewness, and kurtosis for KV pair accessed");
+
 DEFINE_bool(output_qps_stats, false,
             "Output the query per second(qps) statistics \n"
             "For the overall qps, it will contain all qps of each query type. "
@@ -249,6 +256,105 @@ void AnalyzerOptions::SparseCorrelationInput(const std::string& in_str) {
   return;
 }
 
+StatisticsCalculator::StatisticsCalculator(const std::vector<uint64_t>& data) : trace_statistics(data) {}
+
+double StatisticsCalculator::calculateMean() const {
+  return std::accumulate(trace_statistics.begin(), trace_statistics.end(), 0.0) / trace_statistics.size();
+}
+
+double StatisticsCalculator::calculateMode() const {
+  std::map<double, int> frequency;
+  for (double num : trace_statistics) {
+    frequency[num]++;
+  }
+
+  int max_count = 0;
+  double mode = trace_statistics[0];
+  for (const auto& [value, count] : frequency) {
+    if (count > max_count) {
+      max_count = count;
+      mode = value;
+    }
+  }
+  return mode;
+}
+
+double StatisticsCalculator::calculateMedian() const {
+  return getMedian(trace_statistics);
+}
+
+std::vector<double> StatisticsCalculator::calculateQuartiles() const {
+  if (trace_statistics.size() == 1 && trace_statistics[0] == 0) {
+    return {0.0, 0.0, 0.0};
+  }
+  std::vector<uint64_t> sortedTraceStatistics = trace_statistics;
+  std::sort(sortedTraceStatistics.begin(), sortedTraceStatistics.end());
+
+  std::vector<double> quartiles;
+  quartiles.push_back(getMedian(sortedTraceStatistics));
+
+  std::vector<double> lowerHalf(sortedTraceStatistics.begin(), sortedTraceStatistics.begin() + sortedTraceStatistics.size() / 2);
+  std::vector<double> upperHalf(sortedTraceStatistics.begin() + (sortedTraceStatistics.size() + 1) / 2, sortedTraceStatistics.end());
+
+  quartiles.insert(quartiles.begin(), getMedian(lowerHalf));
+  quartiles.push_back(getMedian(upperHalf));
+
+  return quartiles;
+}
+
+double StatisticsCalculator::calculateSkewness() const {
+  double mean = calculateMean();
+  double n = trace_statistics.size();
+  double sumCubedDeviations = 0.0;
+  double sumSquaredDeviations = 0.0;
+
+  for (double x : trace_statistics) {
+    sumCubedDeviations += std::pow(x - mean, 3);
+    sumSquaredDeviations += std::pow(x - mean, 2);
+  }
+
+  double s3 = std::pow((sumSquaredDeviations / n), 1.5);
+  return (sumCubedDeviations / n) / s3;
+}
+
+double StatisticsCalculator::calculateKurtosis() const {
+  double mean = calculateMean();
+  double n = trace_statistics.size();
+  double sumQuarticDeviations = 0.0;
+  double sumSquaredDeviations = 0.0;
+
+  for (double x : trace_statistics) {
+    sumQuarticDeviations += std::pow(x - mean, 4);
+    sumSquaredDeviations += std::pow(x - mean, 2);
+  }
+
+  double m4 = sumQuarticDeviations / n;
+  double m2 = sumSquaredDeviations / n;
+
+  return m4 / (m2 * m2) - 3;
+}
+
+double StatisticsCalculator::getMedian(std::vector<uint64_t> sortedData) const {
+  size_t size = sortedData.size();
+  std::sort(sortedData.begin(), sortedData.end());
+  if (size % 2 == 0) {
+    return (sortedData[size / 2 - 1] + sortedData[size / 2]) / 2;
+  } else {
+    return sortedData[size / 2];
+  }
+}
+
+double StatisticsCalculator::getMedian(std::vector<double> sortedData) const {
+  size_t size = sortedData.size();
+  std::sort(sortedData.begin(), sortedData.end());
+  if (size % 2 == 0) {
+    return (sortedData[size / 2 - 1] + sortedData[size / 2]) / 2;
+  } else {
+    return sortedData[size / 2];
+  }
+}
+
+
 // The trace statistic struct constructor
 TraceStats::TraceStats() {
   cf_id = 0;
@@ -370,6 +476,18 @@ Status TraceAnalyzer::PrepareProcessing() {
   if (!s.ok()) {
     return s;
   }
+
+  if (FLAGS_output_ml_features){
+    std::string ml_feature_file_name;
+    ml_feature_file_name =
+        output_path_ + "/ml_feature.txt";
+    s = env_->NewWritableFile(ml_feature_file_name, &ml_feature_f_,
+                              env_options_);
+    if (!s.ok()) {
+      return s;
+    }
+  }
+
 
   // Prepare and open the trace sequence file writer if needed
   if (FLAGS_convert_to_human_readable_trace) {
@@ -1129,10 +1247,16 @@ Status TraceAnalyzer::ReProcessing() {
       for (int type = 0; type < kTaTypeNum; type++) {
         if (!ta_[type].enabled ||
             ta_[type].stats.find(cf_id) == ta_[type].stats.end()) {
+//
+          if (FLAGS_output_ml_features){
+            TraceStats& stat = ta_[type].stats[cf_id];
+            stat.key_access_counts.push_back(0);
+          }
           continue;
         }
         TraceStats& stat = ta_[type].stats[cf_id];
         for (auto& record : stat.a_key_stats) {
+          stat.key_access_counts.push_back(record.second.access_count);
           if (static_cast<int32_t>(stat.top_k_queue.size()) <
               FLAGS_print_top_k_access) {
             stat.top_k_queue.push(
@@ -1148,6 +1272,8 @@ Status TraceAnalyzer::ReProcessing() {
       }
     }
   }
+
+
   return Status::OK();
 }
 
@@ -1159,6 +1285,72 @@ Status TraceAnalyzer::EndProcessing() {
   }
   if (FLAGS_no_print) {
     return s;
+  }
+  if (FLAGS_output_ml_features && ml_feature_f_){
+    for (int type = 0; type < kTaTypeNum; type++){
+      if (!ta_[type].enabled) {
+        continue;
+      }
+      for (auto& stat_it : ta_[type].stats) {
+        printf("Operation Type: %s\n",
+               ta_[type].type_name.c_str());
+        TraceStats& stat = stat_it.second;
+
+        double key_size_ave = 0.0;
+        double value_size_ave = 0.0;
+        double key_size_vari = 0.0;
+        double value_size_vari = 0.0;
+        if (stat.a_count > 0) {
+          key_size_ave =
+              (static_cast<double>(stat.a_key_size_sum)) / stat.a_count;
+          value_size_ave =
+              (static_cast<double>(stat.a_value_size_sum)) / stat.a_count;
+          key_size_vari = std::sqrt((static_cast<double>(stat.a_key_size_sqsum)) /
+                                        stat.a_count -
+                                    key_size_ave * key_size_ave);
+          value_size_vari = std::sqrt(
+              (static_cast<double>(stat.a_value_size_sqsum)) / stat.a_count -
+              value_size_ave * value_size_ave);
+        }
+        if (value_size_ave == 0.0) {
+          stat.a_value_mid = 0;
+        }
+        StatisticsCalculator stats(stat.key_access_counts);
+
+        double mean = stats.calculateMean();
+        double mode = stats.calculateMode();
+        double median = stats.calculateMedian();
+        std::vector<double> quartiles = stats.calculateQuartiles();
+        double skewness = stats.calculateSkewness();
+        double kurtosis = stats.calculateKurtosis();
+        int unique_keys = stat.key_access_counts.size();
+        if (unique_keys == 1 && stat.key_access_counts[0] == 0){
+          unique_keys = 0;
+        }
+
+        int ret;
+        ret = snprintf(buffer_, sizeof(buffer_),
+                       "%lu,%d,%f,%lu,%f,%f,%lu,%f,%f,%f,%f,%f,%f,%f,%f,",
+                       stat.a_count, unique_keys, key_size_ave, stat.a_key_mid,
+                       key_size_vari, value_size_ave, stat.a_value_mid, value_size_vari,
+                       mean, mode, median, quartiles[0], quartiles[2], skewness, kurtosis);
+        if (ret < 0) {
+          return Status::IOError("Format the output failed");
+        }
+        std::string printout(buffer_);
+        s = ml_feature_f_->Append(printout);
+        if (!s.ok()) {
+          fprintf(stderr, "Write access count distribution file failed\n");
+          return s;
+        }
+
+      }
+
+
+    }
+  }
+  if (ml_feature_f_) {
+    s = ml_feature_f_->Close();
   }
   PrintStatistics();
   if (s.ok()) {
@@ -1535,7 +1727,7 @@ Status TraceAnalyzer::Handle(const GetQueryTraceRecord& record,
 
 Status TraceAnalyzer::Handle(const IteratorSeekQueryTraceRecord& record,
                              std::unique_ptr<TraceRecordResult>* /*result*/) {
-  fprintf(stdout, "IN HANDLE\n");
+//  fprintf(stdout, "IN HANDLE\n");
   TraceOperationType op_type;
   if (record.GetSeekType() == IteratorSeekQueryTraceRecord::kSeek) {
     op_type = TraceOperationType::kIteratorSeek;
@@ -1640,7 +1832,7 @@ Status TraceAnalyzer::OutputAnalysisResult(TraceOperationType op_type,
     size_t cnt =
         op_type == TraceOperationType::kRangeDelete ? 1 : cf_ids.size();
     for (size_t i = 0; i < cnt; i++) {
-      fprintf(stdout, "KEY IN TA:%s\n", keys[i].ToString().c_str());
+//      fprintf(stdout, "KEY IN TA:%s\n", keys[i].ToString().c_str());
       s = WriteTraceSequence(op_type, cf_ids[i], keys[i], value_sizes[i],
                              timestamp);
       if (!s.ok()) {
@@ -1735,18 +1927,18 @@ void TraceAnalyzer::PrintStatistics() {
       ta_[type].total_access += stat.a_count;
       ta_[type].total_succ_access += stat.a_succ_count;
       printf("*********************************************************\n");
-      printf("colume family id: %u\n", stat.cf_id);
+      printf("column family id: %u\n", stat.cf_id);
       printf("Total number of queries to this cf by %s: %" PRIu64 "\n",
              ta_[type].type_name.c_str(), stat.a_count);
       printf("Total unique keys in this cf: %" PRIu64 "\n", total_a_keys);
       printf("Average key size: %f key size medium: %" PRIu64
              " Key size Variation: %f\n",
              key_size_ave, stat.a_key_mid, key_size_vari);
-      if (type == kPut || type == kMerge) {
+//      if (type == kPut || type == kMerge) {
         printf("Average value size: %f Value size medium: %" PRIu64
                " Value size variation: %f\n",
                value_size_ave, stat.a_value_mid, value_size_vari);
-      }
+//      }
       printf("Peak QPS is: %u Average QPS is: %f\n", stat.a_peak_qps,
              stat.a_ave_qps);
 
@@ -1861,10 +2053,10 @@ Status TraceAnalyzer::WriteTraceSequence(const uint32_t& type,
 //  fprintf(stdout, "KEY IN WTT:%s\n", key.ToString().c_str());
   std::string hex_key =
       ROCKSDB_NAMESPACE::LDBCommand::StringToHex(key.ToString());
-  fprintf(stdout, "HEX KEY:%s\n", hex_key.c_str());
+//  fprintf(stdout, "HEX KEY:%s\n", hex_key.c_str());
   std::string reverse_key =
       ROCKSDB_NAMESPACE::LDBCommand::HexToString(hex_key);
-  fprintf(stdout, "REVERSE KEY:%s\n", reverse_key.c_str());
+//  fprintf(stdout, "REVERSE KEY:%s\n", reverse_key.c_str());
 
   int ret;
   ret = snprintf(buffer_, sizeof(buffer_), "%u %u %zu %" PRIu64 "\n", type,

@@ -148,10 +148,10 @@ Status TracerHelper::DecodeTraceRecord(Trace* trace, int trace_file_version,
       PinnableSlice rep;
       if (trace_file_version < 2) {
         rep.PinSelf(trace->payload);
-        fprintf(stdout, "writebatchdata_2:%s\n ", rep.ToString().c_str());
+//        fprintf(stdout, "writebatchdata_2:%s\n ", rep.ToString().c_str());
       } else {
         Slice buf(trace->payload);
-        fprintf(stdout, "trace_payload:%s\n ", trace->payload.c_str());
+//        fprintf(stdout, "trace_payload:%s\n ", trace->payload.c_str());
         GetFixed64(&buf, &trace->payload_map);
         int64_t payload_map = static_cast<int64_t>(trace->payload_map);
         Slice write_batch_data;
@@ -173,11 +173,11 @@ Status TracerHelper::DecodeTraceRecord(Trace* trace, int trace_file_version,
         }
         std::string hex_key =
             ROCKSDB_NAMESPACE::LDBCommand::StringToHex(write_batch_data.ToString());
-        fprintf(stdout, "GET KEY:%s\n", hex_key.c_str());
+//        fprintf(stdout, "GET KEY:%s\n", hex_key.c_str());
         rep.PinSelf(write_batch_data);
 
 
-        fprintf(stdout, "writebatchdata:%s\n", rep.ToString().c_str());
+//        fprintf(stdout, "writebatchdata:%s\n", rep.ToString().c_str());
       }
 
       if (record != nullptr) {
@@ -227,7 +227,7 @@ Status TracerHelper::DecodeTraceRecord(Trace* trace, int trace_file_version,
         PinnableSlice ps;
         std::string hex_key =
             ROCKSDB_NAMESPACE::LDBCommand::StringToHex(get_key.ToString());
-        fprintf(stdout, "GET KEY:%s\n", hex_key.c_str());
+//        fprintf(stdout, "GET KEY:%s\n", hex_key.c_str());
         ps.PinSelf(get_key);
         record->reset(new GetQueryTraceRecord(cf_id, std::move(ps), trace->ts));
       }
@@ -246,7 +246,7 @@ Status TracerHelper::DecodeTraceRecord(Trace* trace, int trace_file_version,
         DecodeCFAndKey(trace->payload, &cf_id, &iter_key);
       } else {
         Slice buf(trace->payload);
-        fprintf(stdout, "HERE IN ELSE\n ");
+//        fprintf(stdout, "HERE IN ELSE\n ");
 
         GetFixed64(&buf, &trace->payload_map);
         int64_t payload_map = static_cast<int64_t>(trace->payload_map);
@@ -282,11 +282,11 @@ Status TracerHelper::DecodeTraceRecord(Trace* trace, int trace_file_version,
 
       if (record != nullptr) {
         std::string hex_iter_key = ROCKSDB_NAMESPACE::LDBCommand::StringToHex(iter_key.ToString());
-        fprintf(stdout, "ITER KEY:%s\n", hex_iter_key.c_str());
+//        fprintf(stdout, "ITER KEY:%s\n", hex_iter_key.c_str());
         std::string l_bound = ROCKSDB_NAMESPACE::LDBCommand::StringToHex(lower_bound.ToString());
-        fprintf(stdout, "LOWER BOUND:%s\n", l_bound.c_str());
+//        fprintf(stdout, "LOWER BOUND:%s\n", l_bound.c_str());
         std::string u_bound = ROCKSDB_NAMESPACE::LDBCommand::StringToHex(upper_bound.ToString());
-        fprintf(stdout, "UPPER BOUND:%s\n", u_bound.c_str());
+//        fprintf(stdout, "UPPER BOUND:%s\n", u_bound.c_str());
         PinnableSlice ps_key;
         ps_key.PinSelf(iter_key);
         PinnableSlice ps_lower;
@@ -416,11 +416,11 @@ Status TracerHelper::DecodeTraceRecordTxt(int trace_type, std::string key, int c
           write_batch_data.replace(29, 1, std::to_string(cf_id));
         }
         write_batch_data = write_batch_data + key.substr(2) + "645E7B56687A22212F25774D5A3B276120462F52455A4A34547740254E587879323F2E417256435A3242365B6A6E5564293420624F7B5C5E61543F566D322E246865633B7E324C282B3D4B4F492C71543B4F7035595736734B7660692475745F415A3A5374";
-        fprintf(stdout, "GET KEY:%s\n", write_batch_data.c_str());
+//        fprintf(stdout, "GET KEY:%s\n", write_batch_data.c_str());
 
         std::string hex_data =
             ROCKSDB_NAMESPACE::LDBCommand::HexToString(write_batch_data);
-        fprintf(stdout, "GET KEY:%s\n", hex_data.c_str());
+//        fprintf(stdout, "GET KEY:%s\n", hex_data.c_str());
         Slice write_data = *new Slice(hex_data);
         rep.PinSelf(write_data);
         record->reset(new WriteQueryTraceRecord(std::move(rep), ts));

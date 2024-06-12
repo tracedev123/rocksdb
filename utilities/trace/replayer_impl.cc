@@ -77,7 +77,6 @@ Status ReplayerImpl::Next(std::unique_ptr<TraceRecord>* record) {
 
 Status ReplayerImpl::Execute(const std::unique_ptr<TraceRecord>& record,
                              std::unique_ptr<TraceRecordResult>* result) {
-  fprintf(stdout, "IN EXECUTE\n");
   return record->Accept(exec_handler_.get(), result);
 }
 
@@ -316,7 +315,6 @@ Status ReplayerImpl::ReplayTxt(
             }
 
             if (result_callback == nullptr) {
-              //        fprintf(stdout, "FROM REPLAYER \n");
               s = Execute(record, nullptr);
             } else {
               std::unique_ptr<TraceRecordResult> res;

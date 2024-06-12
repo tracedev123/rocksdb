@@ -3581,7 +3581,7 @@ class Benchmark {
           fprintf(stderr, "Multi-threaded replay is not yet supported\n");
           ErrorExit();
         }
-        if (FLAGS_trace_file == "") {
+        if (FLAGS_trace_file == "" && FLAGS_txt_file == "") {
           fprintf(stderr, "Please set --trace_file to be replayed from\n");
           ErrorExit();
         }
@@ -4727,20 +4727,6 @@ class Benchmark {
             ColumnFamilyName(i), ColumnFamilyOptions(options)));
       }
 
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          ColumnFamilyName(0), ColumnFamilyOptions(options)));
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          "metadata", ColumnFamilyOptions(options)));
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          "zset_score", ColumnFamilyOptions(options)));
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          "pubsub", ColumnFamilyOptions(options)));
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          "propagate", ColumnFamilyOptions(options)));
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          "stream", ColumnFamilyOptions(options)));
-//      column_families.push_back(ColumnFamilyDescriptor(
-//          "metadata", ColumnFamilyOptions(options)));
       std::vector<int> cfh_idx_to_prob;
       if (!FLAGS_column_family_distribution.empty()) {
         std::stringstream cf_prob_stream(FLAGS_column_family_distribution);
@@ -6020,6 +6006,7 @@ class Benchmark {
         thread->shared->read_rate_limiter->Request(
             256, Env::IO_HIGH, nullptr /* stats */, RateLimiter::OpType::kRead);
       }
+//      std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
       thread->stats.FinishedOps(db_with_cfh, db_with_cfh->db, 1, kRead);
     }
@@ -8356,34 +8343,25 @@ class Benchmark {
   void Replay(ThreadState* /*thread*/, DBWithColumnFamilies* db_with_cfh) {
     Status s;
     std::unique_ptr<TraceReader> trace_reader;
-    s = NewFileTraceReader(FLAGS_env, EnvOptions(), FLAGS_trace_file,
-                           &trace_reader);
-    if (!s.ok()) {
-      fprintf(
-          stderr,
-          "Encountered an error creating a TraceReader from the trace file. "
-          "Error: %s\n",
-          s.ToString().c_str());
-      exit(1);
-    }
-    std::unique_ptr<Replayer> replayer;
-    s = db_with_cfh->db->NewDefaultReplayer(db_with_cfh->cfh,
-                                            std::move(trace_reader), &replayer);
-    if (!s.ok()) {
-      fprintf(stderr,
-              "Encountered an error creating a default Replayer. "
-              "Error: %s\n",
-              s.ToString().c_str());
-      exit(1);
-    }
-    s = replayer->Prepare();
-    if (!s.ok()) {
-      fprintf(stderr, "Prepare for replay failed. Error: %s\n",
-              s.ToString().c_str());
-    }
 
     if (FLAGS_txt_file != ""){
       fprintf(stdout, "Text file exists!\n");
+      trace_reader = nullptr;
+      std::unique_ptr<Replayer> replayer;
+      s = db_with_cfh->db->NewDefaultReplayer(db_with_cfh->cfh,
+                                              std::move(trace_reader), &replayer);
+      if (!s.ok()) {
+        fprintf(stderr,
+                "Encountered an error creating a default Replayer. "
+                "Error: %s\n",
+                s.ToString().c_str());
+        exit(1);
+      }
+      s = replayer->Prepare();
+      if (!s.ok()) {
+        fprintf(stderr, "Prepare for replay failed. Error: %s\n",
+                s.ToString().c_str());
+      }
       s = replayer->ReplayTxt(
           ReplayOptions(static_cast<uint32_t>(FLAGS_trace_replay_threads),
                         FLAGS_trace_replay_fast_forward),
@@ -8391,14 +8369,49 @@ class Benchmark {
           nullptr);
       replayer.reset();
 
+      if (s.ok()) {
+        fprintf(stdout, "Replay completed from trace_file: %s\n",
+                FLAGS_txt_file.c_str());
+      } else {
+        fprintf(stderr, "Replay failed. Error: %s\n", s.ToString().c_str());
+      }
+
     } else {
+      s = NewFileTraceReader(FLAGS_env, EnvOptions(), FLAGS_trace_file,
+                             &trace_reader);
+      if (!s.ok()) {
+        fprintf(
+            stderr,
+            "Encountered an error creating a TraceReader from the trace file. "
+            "Error: %s\n",
+            s.ToString().c_str());
+        exit(1);
+      }
+      std::unique_ptr<Replayer> replayer;
+      s = db_with_cfh->db->NewDefaultReplayer(db_with_cfh->cfh,
+                                              std::move(trace_reader), &replayer);
+      if (!s.ok()) {
+        fprintf(stderr,
+                "Encountered an error creating a default Replayer. "
+                "Error: %s\n",
+                s.ToString().c_str());
+        exit(1);
+      }
+      s = replayer->Prepare();
+      if (!s.ok()) {
+        fprintf(stderr, "Prepare for replay failed. Error: %s\n",
+                s.ToString().c_str());
+      }
+
       fprintf(stdout, "direct read:%d\n", FLAGS_use_direct_reads);
       s = replayer->Replay(
           ReplayOptions(static_cast<uint32_t>(FLAGS_trace_replay_threads),
-                        FLAGS_trace_replay_fast_forward),
-          nullptr);
+                          FLAGS_trace_replay_fast_forward),
+            nullptr);
       replayer.reset();
+
     }
+
     if (s.ok()) {
       fprintf(stdout, "Replay completed from trace_file: %s\n",
               FLAGS_trace_file.c_str());

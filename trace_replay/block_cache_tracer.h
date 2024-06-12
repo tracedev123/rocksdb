@@ -152,7 +152,8 @@ class BlockCacheHumanReadableTraceWriter {
                          ROCKSDB_NAMESPACE::Env* env);
 
   Status WriteHumanReadableTraceRecord(const BlockCacheTraceRecord& access,
-                                       uint64_t block_id, uint64_t get_key_id);
+                                       uint64_t block_id, uint64_t get_key_id,
+                                       std::string usr_key);
 
  private:
   char trace_record_buffer_[1024 * 1024];

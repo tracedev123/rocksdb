@@ -1,5 +1,5 @@
 
-db_path="/tmp/db"
+db_path="/tmp/db_15"
 
 #../cmake-build-debug/db_bench --benchmarks="readrandomwriterandom,stats" --statistics --histogram --use_existing_db=true --db="/tmp/db" --duration=30 \
 #--num_column_families=5 --key_size=20 --prefix_size=20 --keys_per_prefix=0 --value_size=100 \
@@ -11,9 +11,9 @@ db_path="/tmp/db"
 #-block_cache_trace_sampling_frequency=1 \
 ##-trace_file="/tmp/op_trace_file_dbbench"
 
-../cmake-build-debug/db_bench --benchmarks="readrandomwriterandom,stats" --use_existing_db=true --db="/tmp/db" --num_column_families=5 \
---prefix_size=20 --keys_per_prefix=0 --threads=1 \
---use_direct_io_for_flush_and_compaction=true --use_direct_reads=true --cache_index_and_filter_blocks=true --perf_level=2 --key_size=20 --value_size=100  \
---readwritepercent=90 --cache_size=1048576 --statistics \
---num=2000
+../cmake-build-debug/db_bench --benchmarks="readrandomwriterandom" --use_existing_db=true --db="/tmp/db_15" \
+--key_size=48 --value_size=43 --threads=4 --perf_level=3 \
+--use_direct_io_for_flush_and_compaction=true --use_direct_reads=true \
+--readwritepercent=90 --cache_size=8388608  \
+--num=3000000 -trace_file="/tmp/op_trace_file_dbbench"
 

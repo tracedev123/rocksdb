@@ -14,6 +14,7 @@
 #include "db/dbformat.h"
 #include "rocksdb/slice.h"
 #include "rocksdb/trace_record.h"
+#include "rocksdb/utilities/ldb_cmd.h"
 #include "util/coding.h"
 #include "util/hash.h"
 #include "util/string_util.h"
@@ -328,20 +329,53 @@ Status BlockCacheHumanReadableTraceWriter::NewWritableFile(
                               &human_readable_trace_file_writer_, EnvOptions());
 }
 
+//Status BlockCacheHumanReadableTraceWriter::WriteHumanReadableTraceRecord(
+//    const BlockCacheTraceRecord& access, unsigned long block_id,
+//    unsigned long get_key_id, std::string user_key) {
+//  if (!human_readable_trace_file_writer_) {
+//    return Status::OK();
+//  }
+//  int ret = snprintf(
+//      trace_record_buffer_, sizeof(trace_record_buffer_),
+//      "%" PRIu64 ",%" PRIu64 ",%u,%" PRIu64 ",%" PRIu64 ",%s,%" PRIu32
+//      ",%" PRIu64 ",%u,%u,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%u,%u,%" PRIu64
+//      ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
+//      access.access_timestamp, block_id, access.block_type, access.block_size,
+//      access.cf_id, access.cf_name.c_str(), access.level, access.sst_fd_number,
+//      access.caller, access.no_insert, access.get_id, get_key_id, user_key,
+//      access.referenced_data_size, access.is_cache_hit,
+//      access.referenced_key_exist_in_block, access.num_keys_in_block,
+//      BlockCacheTraceHelper::GetTableId(access),
+//      BlockCacheTraceHelper::GetSequenceNumber(access),
+//      static_cast<uint64_t>(access.block_key.size()),
+//      static_cast<uint64_t>(access.referenced_key.size()),
+//      BlockCacheTraceHelper::GetBlockOffsetInFile(access));
+//
+////  int ret = snprintf(
+////      trace_record_buffer_, sizeof(trace_record_buffer_),
+////      "%d\n",
+////      access.is_cache_hit);
+//  if (ret < 0) {
+//    return Status::IOError("failed to format the output");
+//  }
+//  std::string printout(trace_record_buffer_);
+//  return human_readable_trace_file_writer_->Append(printout);
+//}
+
 Status BlockCacheHumanReadableTraceWriter::WriteHumanReadableTraceRecord(
-    const BlockCacheTraceRecord& access, uint64_t block_id,
-    uint64_t get_key_id) {
+    const BlockCacheTraceRecord& access, unsigned long block_id,
+    unsigned long get_key_id, std::string user_key) {
   if (!human_readable_trace_file_writer_) {
     return Status::OK();
   }
   int ret = snprintf(
       trace_record_buffer_, sizeof(trace_record_buffer_),
       "%" PRIu64 ",%" PRIu64 ",%u,%" PRIu64 ",%" PRIu64 ",%s,%" PRIu32
-      ",%" PRIu64 ",%u,%u,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%u,%u,%" PRIu64
-      ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
+      ",%" PRIu64 ",%u,%u,%" PRIu64 ",%" PRIu64 ",%s,%" PRIu64
+      ",%u,%u,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
       access.access_timestamp, block_id, access.block_type, access.block_size,
       access.cf_id, access.cf_name.c_str(), access.level, access.sst_fd_number,
-      access.caller, access.no_insert, access.get_id, get_key_id,
+      access.caller, access.no_insert, access.get_id, get_key_id, ROCKSDB_NAMESPACE::LDBCommand::StringToHex(user_key).c_str(),
       access.referenced_data_size, access.is_cache_hit,
       access.referenced_key_exist_in_block, access.num_keys_in_block,
       BlockCacheTraceHelper::GetTableId(access),
@@ -349,12 +383,19 @@ Status BlockCacheHumanReadableTraceWriter::WriteHumanReadableTraceRecord(
       static_cast<uint64_t>(access.block_key.size()),
       static_cast<uint64_t>(access.referenced_key.size()),
       BlockCacheTraceHelper::GetBlockOffsetInFile(access));
+
+//    int ret = snprintf(
+//        trace_record_buffer_, sizeof(trace_record_buffer_),
+//        "%d\n",
+//        access.is_cache_hit);
+
   if (ret < 0) {
     return Status::IOError("failed to format the output");
   }
   std::string printout(trace_record_buffer_);
   return human_readable_trace_file_writer_->Append(printout);
 }
+
 
 BlockCacheHumanReadableTraceReader::BlockCacheHumanReadableTraceReader(
     const std::string& trace_file_path)

@@ -747,28 +747,28 @@ DBImpl::~DBImpl() {
 
   Status s;
   if(all_trace) {
-    fprintf(stdout, "STOPPING TRACEEEEEEEEEE\n");
-    s = EndTrace();
-    if (!s.ok()) {
-      fprintf(stderr, "Encountered an error ending the trace, %s\n",
-              s.ToString().c_str());
-    }
+//    fprintf(stdout, "STOPPING TRACEEEEEEEEEE\n");
+//    s = EndTrace();
+//    if (!s.ok()) {
+//      fprintf(stderr, "Encountered an error ending the trace, %s\n",
+//              s.ToString().c_str());
+//    }
 
 
-    s = EndBlockCacheTrace();
-    if (!s.ok()) {
-      fprintf(stderr,
-              "Encountered an error ending the block cache tracing, %s\n",
-              s.ToString().c_str());
-    }
-
-
-    s = EndIOTrace();
-    if (!s.ok()) {
-      fprintf(stderr,
-              "Encountered an error ending the io tracing, %s\n",
-              s.ToString().c_str());
-    }
+//    s = EndBlockCacheTrace();
+//    if (!s.ok()) {
+//      fprintf(stderr,
+//              "Encountered an error ending the block cache tracing, %s\n",
+//              s.ToString().c_str());
+//    }
+//
+//
+//    s = EndIOTrace();
+//    if (!s.ok()) {
+//      fprintf(stderr,
+//              "Encountered an error ending the io tracing, %s\n",
+//              s.ToString().c_str());
+//    }
 
 //    std::vector<ColumnFamilyHandle*> handles;
 //    fprintf(stdout, "Replaying....\n");

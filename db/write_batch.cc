@@ -268,7 +268,7 @@ uint32_t WriteBatch::ComputeContentFlags() const {
   if ((rv & ContentFlags::DEFERRED) != 0) {
     BatchContentClassifier classifier;
     // Should we handle status here?
-    fprintf(stdout, "IN COMPUTE CONTENT FLAGS\n");
+//    fprintf(stdout, "IN COMPUTE CONTENT FLAGS\n");
     Iterate(&classifier).PermitUncheckedError();
     rv = classifier.content_flags;
 
@@ -2948,7 +2948,7 @@ Status WriteBatchInternal::InsertInto(
   SetSequence(writer->batch, sequence);
   inserter.set_log_number_ref(writer->log_ref);
   inserter.set_prot_info(writer->batch->prot_info_.get());
-  fprintf(stdout, "IN INSERT INFO 2\n");
+//  fprintf(stdout, "IN INSERT INFO 2\n");
   Status s = writer->batch->Iterate(&inserter);
   assert(!seq_per_batch || batch_cnt != 0);
   assert(!seq_per_batch || inserter.sequence() - sequence == batch_cnt);

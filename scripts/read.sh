@@ -1,15 +1,23 @@
-
-
-
-../cmake-build-debug-remote/db_bench --benchmarks="readrandom,stats" --statistics --histogram --use_existing_db=true --db="/nvme/fillseq_9" --duration=60 \
+../cmake-build-debug/db_bench --benchmarks="readrandom" --use_existing_db=true --db="/tmp/db_"  \
 --key_size=48 -value_size=43 --perf_level=3 \
---cache_index_and_filter_blocks --cache_size=268435456 \
---disable_auto_compactions=1 --disable_wal=1 --compression_type=none \
---min_level_to_compress=-1 --compression_ratio=1 --num=1000000 \
+--cache_size=8388608 \
+--num=1000 \
 --threads=1 --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
--block_cache_trace_max_trace_file_size_in_bytes=1073741824 \
--block_cache_trace_sampling_frequency=1 \
+-trace_file="/tmp/op_trace_file_dbbench"
+
+
+
+
+#../cmake-build-debug/db_bench --benchmarks="readrandom" --use_existing_db=true --db="/tmp/db"  \
+#--key_size=48 -value_size=43 --perf_level=3 \
+#--cache_index_and_filter_blocks --cache_size=268435456 \
+#--disable_auto_compactions=1 --disable_wal=1 --compression_type=none \
+#--min_level_to_compress=-1 --compression_ratio=1 --num=1000 \
+#--threads=1 --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
+#-block_cache_trace_max_trace_file_size_in_bytes=1073741824 \
+#-block_cache_trace_sampling_frequency=1 \
 #-trace_file="/tmp/op_trace_file_dbbench"
+#--duration=60
 
 #../cmake-build-debug/db_bench --benchmarks="readrandom" --use_existing_db=true --db="/tmp/db" --duration=30 \
 #--key_size=48 --num_column_families=5 \

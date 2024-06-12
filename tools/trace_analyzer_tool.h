@@ -119,6 +119,7 @@ struct TraceStats {
   std::list<TraceUnit> time_series;
   std::vector<std::pair<uint64_t, uint64_t>> correlation_output;
   std::map<uint32_t, uint64_t> uni_key_num;
+  std::vector<uint64_t> key_access_counts;
 
   std::unique_ptr<ROCKSDB_NAMESPACE::WritableFile> time_series_f;
   std::unique_ptr<ROCKSDB_NAMESPACE::WritableFile> a_key_f;
@@ -163,6 +164,28 @@ struct CfUnit {
   std::map<uint64_t, uint64_t> w_key_size_stats;  // whole key space key size
                                                   // statistic this cf
   std::map<uint32_t, uint32_t> cf_qps;
+};
+
+class StatisticsCalculator {
+ public:
+  // Constructor with renamed parameter to avoid shadowing the member variable
+  StatisticsCalculator(const std::vector<uint64_t>& data);
+
+  // Methods for statistical calculations
+  double calculateMean() const;
+  double calculateMode() const;
+  double calculateMedian() const;
+  std::vector<double> calculateQuartiles() const;
+  double calculateSkewness() const;
+  double calculateKurtosis() const;
+
+ private:
+  // Member variable to store the trace statistics
+  std::vector<uint64_t> trace_statistics;
+
+  // Helper method to calculate the median of a vector
+  double getMedian(std::vector<uint64_t> sortedData) const;
+  double getMedian(std::vector<double> sortedData) const;
 };
 
 class TraceAnalyzer : private TraceRecord::Handler,
@@ -286,6 +309,7 @@ class TraceAnalyzer : private TraceRecord::Handler,
   uint64_t time_series_start_;
   uint32_t sample_max_;
   uint32_t cur_time_sec_;
+  std::unique_ptr<ROCKSDB_NAMESPACE::WritableFile> ml_feature_f_;
   std::unique_ptr<ROCKSDB_NAMESPACE::WritableFile>
       trace_sequence_f_;                                    // readable trace
   std::unique_ptr<ROCKSDB_NAMESPACE::WritableFile> qps_f_;  // overall qps
@@ -326,4 +350,6 @@ class TraceAnalyzer : private TraceRecord::Handler,
 int trace_analyzer_tool(int argc, char** argv);
 
 }  // namespace ROCKSDB_NAMESPACE
+
+
 

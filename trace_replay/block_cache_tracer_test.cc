@@ -379,7 +379,8 @@ TEST_F(BlockCacheTracerTest, HumanReadableTrace) {
     // Generate a human readable trace file.
     BlockCacheHumanReadableTraceWriter writer;
     ASSERT_OK(writer.NewWritableFile(trace_file_path_, env_));
-    ASSERT_OK(writer.WriteHumanReadableTraceRecord(record, 1, 1));
+    ASSERT_OK(
+        writer.WriteHumanReadableTraceRecord(record, 1, 1, std::string()));
     ASSERT_OK(env_->FileExists(trace_file_path_));
   }
   {

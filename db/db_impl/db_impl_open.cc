@@ -1709,68 +1709,68 @@ static Status StartDBImplAllTrace(DBImpl *impl) {
 
 
   rocksdb::Status s;
-  if (op_trace_file != "") {
-    std::unique_ptr<rocksdb::TraceWriter> trace_writer;
-    printf("RocksDB: before newfiletracewriter\n");
-    s = rocksdb::NewFileTraceWriter(env, rocksdb::EnvOptions(),
-                                    op_trace_file, &trace_writer);
-    printf("RocksDB: after newfiletracewriter\n");
-    if (!s.ok()) {
-      fprintf(stderr, "Encountered an error starting a trace, %s\n",
-              s.ToString().c_str());
-      return s;
-    }
-    printf("RocksDB: before start trace\n");
-    s = db->StartTrace(trace_options, std::move(trace_writer));
-    printf("RocksDB: after start trace\n");
-    if (!s.ok()) {
-      fprintf(stderr, "Encountered an error starting a trace %s\n",
-              s.ToString().c_str());
-      return s;
-    }
+//  if (op_trace_file != "") {
+//    std::unique_ptr<rocksdb::TraceWriter> trace_writer;
+//    printf("RocksDB: before newfiletracewriter\n");
+//    s = rocksdb::NewFileTraceWriter(env, rocksdb::EnvOptions(),
+//                                    op_trace_file, &trace_writer);
+//    printf("RocksDB: after newfiletracewriter\n");
+//    if (!s.ok()) {
+//      fprintf(stderr, "Encountered an error starting a trace, %s\n",
+//              s.ToString().c_str());
+//      return s;
+//    }
+//    printf("RocksDB: before start trace\n");
+//    s = db->StartTrace(trace_options, std::move(trace_writer));
+//    printf("RocksDB: after start trace\n");
+//    if (!s.ok()) {
+//      fprintf(stderr, "Encountered an error starting a trace %s\n",
+//              s.ToString().c_str());
+//      return s;
+//    }
+//
+//    fprintf(stdout, "Tracing the workload to11wdwwdw11 [%s]\n", op_trace_file.c_str());
+//  }
 
-    fprintf(stdout, "Tracing the workload to11wdwwdw11 [%s]\n", op_trace_file.c_str());
-  }
-
-  if (block_cache_trace_file != "") {
-    std::unique_ptr<rocksdb::TraceWriter> trace_writer;
-    s = rocksdb::NewFileTraceWriter(env, rocksdb::EnvOptions(),
-                                    block_cache_trace_file,
-                                    &trace_writer);
-    if (!s.ok()) {
-      fprintf(stderr, "Error encoutnered starting block cache trace, %s\n",
-              s.ToString().c_str());
-    }
-    s = db->StartBlockCacheTrace(block_cache_trace_options,
-                                 std::move(trace_writer));
-    if (!s.ok()) {
-      fprintf(stderr, "Error encoutnered starting block cache trace, %s\n",
-              s.ToString().c_str());
-    }
-    fprintf(stdout, "block cache trace workload to [%s]\n",
-            block_cache_trace_file.c_str());
-  }
-
-  if (io_trace_file != "") {
-    std::unique_ptr<rocksdb::TraceWriter> trace_writer;
-    s = rocksdb::NewFileTraceWriter(env, rocksdb::EnvOptions(),
-                                    io_trace_file, &trace_writer);
-
-    if (!s.ok()) {
-      fprintf(stderr, "Error encountered at starting io trace %s\n",
-              s.ToString().c_str());
-      return s;
-    }
-    s = db->StartIOTrace(io_trace_options, std::move(trace_writer));
-
-    if (!s.ok()) {
-      fprintf(stderr, "Error encountered at starting io trace %s\n",
-              s.ToString().c_str());
-      return s;
-    }
-    fprintf(stdout, "writing io trace data to [%s]\n",
-            io_trace_file.c_str());
-  }
+//  if (block_cache_trace_file != "") {
+//    std::unique_ptr<rocksdb::TraceWriter> trace_writer;
+//    s = rocksdb::NewFileTraceWriter(env, rocksdb::EnvOptions(),
+//                                    block_cache_trace_file,
+//                                    &trace_writer);
+//    if (!s.ok()) {
+//      fprintf(stderr, "Error encoutnered starting block cache trace, %s\n",
+//              s.ToString().c_str());
+//    }
+//    s = db->StartBlockCacheTrace(block_cache_trace_options,
+//                                 std::move(trace_writer));
+//    if (!s.ok()) {
+//      fprintf(stderr, "Error encoutnered starting block cache trace, %s\n",
+//              s.ToString().c_str());
+//    }
+//    fprintf(stdout, "block cache trace workload to [%s]\n",
+//            block_cache_trace_file.c_str());
+//  }
+//
+//  if (io_trace_file != "") {
+//    std::unique_ptr<rocksdb::TraceWriter> trace_writer;
+//    s = rocksdb::NewFileTraceWriter(env, rocksdb::EnvOptions(),
+//                                    io_trace_file, &trace_writer);
+//
+//    if (!s.ok()) {
+//      fprintf(stderr, "Error encountered at starting io trace %s\n",
+//              s.ToString().c_str());
+//      return s;
+//    }
+//    s = db->StartIOTrace(io_trace_options, std::move(trace_writer));
+//
+//    if (!s.ok()) {
+//      fprintf(stderr, "Error encountered at starting io trace %s\n",
+//              s.ToString().c_str());
+//      return s;
+//    }
+//    fprintf(stdout, "writing io trace data to [%s]\n",
+//            io_trace_file.c_str());
+//  }
 
 //  std::vector<ColumnFamilyHandle*> handles;
 //
