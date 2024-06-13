@@ -18,7 +18,7 @@ $exec_path --benchmarks="fillrandom" --db="$db_path" --perf_level=3 \
 --key_size=48 --value_size=43 --threads=1 \
 --use_direct_reads=true --cache_size=268435456 \
 --use_direct_io_for_flush_and_compaction=true \
---num=15000000
+--num=3000000
 #
 ##
 #../cmake-build-debug/db_bench --benchmarks="readrandom,stats" --use_existing_db=true --db="$db_path" \
@@ -31,7 +31,7 @@ $exec_path --benchmarks="fillrandom" --db="$db_path" --perf_level=3 \
 --key_size=48 --value_size=43 --perf_level=3 --statistics  \
 --use_direct_io_for_flush_and_compaction=true --use_direct_reads=true \
 --readwritepercent=85 --cache_size=268435456  \
---num=10000000 -trace_file="/tmp/op_trace_file_dbbench" > "$trace_data_dir/statistics.txt"
+--num=2000000 -trace_file="/tmp/op_trace_file_dbbench" > "$trace_data_dir/statistics.txt"
 
 #$exec_path --benchmarks="mixgraph,stats" --use_direct_io_for_flush_and_compaction=true -db=$db_path \
 #--use_direct_reads=true --cache_size=268435456 --keyrange_dist_a=14.18 --keyrange_dist_b=-2.917 \
@@ -51,29 +51,29 @@ $exec_path --benchmarks="fillrandom" --db="$db_path" --perf_level=3 \
 trace_analyzer_exec="../cmake-build-debug/trace_analyzer"
 
 
-#$trace_analyzer_exec \
-#  -analyze_get \
-#  -analyze_put \
-#  -analyze_delete \
-#  -analyze_iterator \
-#  -analyze_merge \
-#  -analyze_multiget \
-#  -analyze_range_delete \
-#  -analyze_single_delete \
-#  -convert_to_human_readable_trace \
-#  -key_space_dir="$key_space_dir" \
-#  -output_key_distribution  \
-#  -output_access_count_stats \
-#  -output_dir="$trace_data_dir" \
-#  -output_key_stats \
-#  -output_qps_stats \
-#  -output_value_distribution \
-#  -print_overall_stats \
-#  -print_top_k_access=5 \
-#  -output_ml_features \
-#  -trace_path="/tmp/op_trace_file_dbbench" \
-#  > "$trace_data_dir/qlt.txt"
-#
+$trace_analyzer_exec \
+  -analyze_get \
+  -analyze_put \
+  -analyze_delete \
+  -analyze_iterator \
+  -analyze_merge \
+  -analyze_multiget \
+  -analyze_range_delete \
+  -analyze_single_delete \
+  -convert_to_human_readable_trace \
+  -key_space_dir="$key_space_dir" \
+  -output_key_distribution  \
+  -output_access_count_stats \
+  -output_dir="$trace_data_dir" \
+  -output_key_stats \
+  -output_qps_stats \
+  -output_value_distribution \
+  -print_overall_stats \
+  -print_top_k_access=5 \
+  -output_ml_features \
+  -trace_path="/tmp/op_trace_file_dbbench" \
+  > "$trace_data_dir/qlt.txt"
+
 #while [[ $# -gt 0 ]]; do
 #  case $1 in
 #    --disable_bcp)
