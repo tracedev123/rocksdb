@@ -1,0 +1,1 @@
+../io_tracer_parser -io_trace_file="/tmp/io_trace_file_dbbench"

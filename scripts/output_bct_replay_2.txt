@@ -1,0 +1,95 @@
+Running for 1 seconds: Processed 29279 records/second. Trace duration 2 seconds. Observed miss ratio 95.78
+Running for 11 seconds: Processed 36472 records/second. Trace duration 28 seconds. Observed miss ratio 95.56
+Running for 21 seconds: Processed 38175 records/second. Trace duration 55 seconds. Observed miss ratio 95.58
+Running for 31 seconds: Processed 38979 records/second. Trace duration 82 seconds. Observed miss ratio 95.56
+Running for 41 seconds: Processed 39156 records/second. Trace duration 109 seconds. Observed miss ratio 95.55
+Running for 51 seconds: Processed 39900 records/second. Trace duration 138 seconds. Observed miss ratio 95.56
+Running for 54 seconds: Processed 40572 records/second. Trace duration 149 seconds. Observed miss ratio 95.56
+Status: Result incomplete: 
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family column_family_name_000001:
+ Number of files:1 Number of blocks: 6250 Number of accesses: 336476
+Number of Data blocks: 6250 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 336476 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 336476 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 17: Number of accesses: 336476 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 336476 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family column_family_name_000002:
+ Number of files:1 Number of blocks: 6250 Number of accesses: 335763
+Number of Data blocks: 6250 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 335763 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 335763 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 18: Number of accesses: 335763 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 335763 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family column_family_name_000003:
+ Number of files:1 Number of blocks: 6250 Number of accesses: 336592
+Number of Data blocks: 6250 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 336592 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 336592 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 19: Number of accesses: 336592 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 336592 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family column_family_name_000004:
+ Number of files:1 Number of blocks: 6250 Number of accesses: 335439
+Number of Data blocks: 6250 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 335439 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 335439 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 20: Number of accesses: 335439 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 335439 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family default:
+ Number of files:3 Number of blocks: 21198 Number of accesses: 846670
+Number of Data blocks: 21198 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 846670 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 846670 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 16: Number of accesses: 255357 Percent: 30.16
+	 File 27: Number of accesses: 255478 Percent: 30.17
+	 File 34: Number of accesses: 335835 Percent: 39.67
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 846670 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
+Overall statistics:
+Number of files: 7 Number of blocks: 46198 Number of accesses: 2190940
+Number of Data blocks: 46198 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 2190940 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 2190940 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 2190940 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************

@@ -1,0 +1,36 @@
+Running for 1 seconds: Processed 48383 records/second. Trace duration 2 seconds. Observed miss ratio 48.25
+Running for 10 seconds: Processed 47908 records/second. Trace duration 30 seconds. Observed miss ratio 48.30
+Status: Result incomplete: 
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family default:
+ Number of files:1 Number of blocks: 6251 Number of accesses: 479086
+Number of Index blocks: 1 Percent: 0.02
+Number of Data blocks: 6250 Percent: 99.98
+***************************************************************
+Caller Get: Number of accesses 479086 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 479086 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 16: Number of accesses: 479086 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Index: Number of accesses: 239161 Percent: 49.92
+	 Block Type Data: Number of accesses: 239925 Percent: 50.08
+***************************************************************
+***************************************************************
+***************************************************************
+Overall statistics:
+Number of files: 1 Number of blocks: 6251 Number of accesses: 479086
+Number of Index blocks: 1 Percent: 0.02
+Number of Data blocks: 6250 Percent: 99.98
+***************************************************************
+Caller Get: Number of accesses 479086 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 479086 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Index: Number of accesses: 239161 Percent: 49.92
+	 Block Type Data: Number of accesses: 239925 Percent: 50.08
+***************************************************************
+***************************************************************
+***************************************************************

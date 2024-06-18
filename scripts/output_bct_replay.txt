@@ -1,0 +1,32 @@
+Running for 1 seconds: Processed 37070 records/second. Trace duration 6 seconds. Observed miss ratio 74.77
+Running for 6 seconds: Processed 39860 records/second. Trace duration 40 seconds. Observed miss ratio 74.04
+Status: Result incomplete: 
+***************************************************************
+***************************************************************
+***************************************************************
+Statistics for column family default:
+ Number of files:1 Number of blocks: 7474 Number of accesses: 239161
+Number of Data blocks: 7474 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 239161 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 239161 Percent: 100.00
+Caller Get: Number of accesses per file break down
+	 File 27: Number of accesses: 239161 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 239161 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
+Overall statistics:
+Number of files: 1 Number of blocks: 7474 Number of accesses: 239161
+Number of Data blocks: 7474 Percent: 100.00
+***************************************************************
+Caller Get: Number of accesses 239161 Percent: 100.00
+Caller Get: Number of accesses per level break down
+	 Level 0: Number of accesses: 239161 Percent: 100.00
+Caller Get: Number of accesses per block type break down
+	 Block Type Data: Number of accesses: 239161 Percent: 100.00
+***************************************************************
+***************************************************************
+***************************************************************
